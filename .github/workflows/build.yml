@@ -27,12 +27,14 @@ jobs:
           CONFIG_TARGET_ath79_generic=y
           CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr941hp-v2=y
           CONFIG_PACKAGE_luci=y
+          CONFIG_PACKAGE_rpcd=y
+          CONFIG_PACKAGE_rpcd-mod-luci=y
           EOF
           make defconfig
 
       - name: Compile firmware
         run: |
-          make -j2
+          make -j2 || make package/feeds/luci/rpcd-mod-luci/compile V=s
 
       - name: Upload firmware artifacts
         uses: actions/upload-artifact@v4
@@ -40,5 +42,3 @@ jobs:
         with:
           name: openwrt-tl-wr941hp-v2-firmware
           path: bin/targets/ath79/generic/*tl-wr941hp-v2*
-
-          
