@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3
+          sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 zstd
 
       - name: Download and extract ImageBuilder
         run: |
@@ -25,14 +25,16 @@ jobs:
           tar -xf ib.tar.xz
           mv openwrt-imagebuilder-* ib
 
-      - name: Build firmware with LuCI
+      - name: Detect profile and build firmware with LuCI
         run: |
           cd ib
-          make image PROFILE="tplink_tl-wr941hp-v2" PACKAGES="luci"
+          make info | grep -i "941hp" || true
+          PROFILE=$(make info | grep -iE "wr941hp.*v2|941hp-v2" | head -n1 | awk '{print $1}')
+          echo "Detected profile: $PROFILE"
+          make image PROFILE="$PROFILE" PACKAGES="luci"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: tl-wr941hp-v2-imagebuilder
-          path: ib/bin/targets/ath79/generic/*tl-wr941hp-v2*
-          
+          path: ib/bin/targets/ath79/generic/*941hp*
