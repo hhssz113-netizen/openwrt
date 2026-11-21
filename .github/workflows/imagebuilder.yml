@@ -25,16 +25,13 @@ jobs:
           tar -xf ib.tar.xz
           mv openwrt-imagebuilder-* ib
 
-      - name: Detect profile and build firmware with LuCI
+      - name: Build firmware for TL-WR941HP v1/v2 with LuCI
         run: |
           cd ib
-          make info | grep -i "941hp" || true
-          PROFILE=$(make info | grep -iE "wr941hp.*v2|941hp-v2" | head -n1 | awk '{print $1}')
-          echo "Detected profile: $PROFILE"
-          make image PROFILE="$PROFILE" PACKAGES="luci"
+          make image PROFILE="tplink_tl-wr941hp-v1" PACKAGES="luci"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: tl-wr941hp-v2-imagebuilder
+          name: tl-wr941hp-v2-firmware
           path: ib/bin/targets/ath79/generic/*941hp*
